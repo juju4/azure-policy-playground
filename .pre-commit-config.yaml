@@ -19,6 +19,11 @@ repos:
       - id: check-xml
       # - id: detect-aws-credentials
       - id: check-docstring-first
+      - id: pretty-format-json
+        args:
+          - "--autofix"
+          - "--indent=4"
+          - "--no-sort-keys"
   - repo: https://github.com/codespell-project/codespell
     rev: v2.2.2
     hooks:
