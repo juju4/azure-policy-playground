@@ -6,5 +6,23 @@
 			"strongType": "location",
 			"displayName": "Allowed locations"
 		}
+	},
+	"listOfUnrestrictedResourceGroups": {
+		"type": "Array",
+		"defaultValue": [],
+		"metadata": {
+			"description": "The list of resource groups for which policy won't be applied.",
+			"displayName": "Unrestricted resource groups",
+			"strongType": "resourceGroups"
+		}
+	},
+	"maxExemptDays": {
+		"type": "string",
+		"defaultValue": "365",
+		"metadata": {
+			"description": "The maximum allowed days for policy exemption.",
+			"displayName": "Maximum days for policy exemption",
+			"strongType": "string"
+		}
 	}
 }
