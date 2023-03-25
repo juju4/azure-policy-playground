@@ -136,11 +136,29 @@ $policyDef = Get-AzPolicyDefinition -Id '/providers/Microsoft.Authorization/poli
 $Subscription = Get-AzSubscription -SubscriptionName 'Azure Subscription 1'
 $scope = "/subscriptions/$($Subscription.Id)"
 # Params
-$policyparam = '{ "listOfResourceTypesAllowed": { "value": [ "microsoft.compute/locations/virtualmachines", "microsoft.compute/virtualmachines", "microsoft.compute/virtualmachines/extensions", "microsoft.compute/virtualmachines/runcommands", "microsoft.compute/virtualmachines/metricdefinitions", "microsoft.network/networksecuritygroups", "microsoft.keyvault/vaults", "microsoft.web/sites/functions", "microsoft.storage/storageaccounts", "microsoft.compute/disks", "microsoft.network/virtualnetworks", "microsoft.network/virtualnetworks/subnets", "microsoft.network/publicipaddresses", "microsoft.network/privateendpoints", "microsoft.network/networkinterfaces" ] } }'
+# Basic VM setup and dependencies
+$policyparam = '{ "listOfResourceTypesAllowed": { "value": [ "microsoft.compute/locations/virtualmachines", "microsoft.compute/virtualmachines", "microsoft.compute/virtualmachines/extensions", "microsoft.compute/virtualmachines/runcommands", "microsoft.compute/virtualmachines/metricdefinitions", "microsoft.network/networksecuritygroups", "microsoft.keyvault/vaults", "microsoft.web/sites/functions", "microsoft.storage/storageaccounts", "microsoft.compute/disks", "microsoft.network/virtualnetworks", "microsoft.network/virtualnetworks/subnets", "microsoft.network/publicipaddresses", "microsoft.network/privateendpoints", "microsoft.network/networkinterfaces", "microsoft.recoveryservices/vaults" ] } }'
 # for azure function for TagWithCreator
 $policyparam = '{ "listOfResourceTypesAllowed": { "value": [ "microsoft.compute/locations/virtualmachines", "microsoft.compute/virtualmachines", "microsoft.compute/virtualmachines/extensions", "microsoft.compute/virtualmachines/runcommands", "microsoft.compute/virtualmachines/metricdefinitions", "microsoft.network/networksecuritygroups", "microsoft.keyvault/vaults", "microsoft.web/sites/functions", "microsoft.storage/storageaccounts", "microsoft.compute/disks", "microsoft.network/virtualnetworks", "microsoft.network/virtualnetworks/subnets", "microsoft.network/publicipaddresses", "microsoft.network/privateendpoints", "microsoft.network/networkinterfaces", "microsoft.web/serverfarms", "microsoft.web/sites", "microsoft.insights/components", "microsoft.policyinsights/eventgridfilters", "microsoft.eventgrid/systemtopics", "microsoft.eventgrid/systemtopics/eventsubscriptions", "microsoft.eventgrid/topics", "microsoft.eventgrid/topictypes" ] } }'
+# for sentinel only scope
+$policyparam = '{ "listOfResourceTypesAllowed": { "value": [ "Microsoft.Resources/templateSpecs", "Microsoft.Web/connections", "Microsoft.Logic/workflows", "microsoft.insights/workbooks", "Microsoft.OperationsManagement/solutions", "microsoft.alertsmanagement/smartDetectorAlertRules", "Microsoft.Web/customApis", "Microsoft.Storage/storageAccounts", "Microsoft.Web/serverFarms", "microsoft.insights/dataCollectionRules", "Microsoft.OperationalInsights/workspaces", "Microsoft.Logic/integrationAccounts", "Microsoft.Insights/workbooks", "Microsoft.Insights/components", "microsoft.web/sites", "microsoft.insights/actiongroups" ] }, "listOfUnrestrictedResourceGroups": { "value": [ "unrestricted-playground-rg" ] }, "maxExemptDays": { "value": "365" } }'
 # Create the Policy Assignment
 $assignment = New-AzPolicyAssignment -Name 'Allowed resource types' -DisplayName 'Allowed resource types' -Scope $scope -PolicyDefinition $policyDef -PolicyParameter $policyparam
+```
+
+If custom local policy files
+```powershell
+$Subscription = Get-AzSubscription -SubscriptionName 'Azure Subscription 1'
+$scope = "/subscriptions/$($Subscription.Id)"
+$policyDef = New-AzPolicyDefinition -Name 'AllowedResourceTypesCustom' -Policy ./allowed-resourcetypes/azurepolicy.rules.json -Parameter ./allowed-resourcetypes/azurepolicy.parameters.json
+Get-AzPolicyDefinition -Name 'AllowedResourceTypesCustom'
+$policyparam = '{ "listOfResourceTypesAllowed": { "value": [ "microsoft.compute/locations/virtualmachines", "microsoft.compute/virtualmachines", "microsoft.compute/virtualmachines/extensions", "microsoft.compute/virtualmachines/runcommands", "microsoft.compute/virtualmachines/metricdefinitions", "microsoft.network/networksecuritygroups", "microsoft.keyvault/vaults", "microsoft.web/sites/functions", "microsoft.storage/storageaccounts", "microsoft.compute/disks", "microsoft.network/virtualnetworks", "microsoft.network/virtualnetworks/subnets", "microsoft.network/publicipaddresses", "microsoft.network/privateendpoints", "microsoft.network/networkinterfaces", "microsoft.web/serverfarms", "microsoft.web/sites", "microsoft.insights/components", "microsoft.policyinsights/eventgridfilters", "microsoft.eventgrid/systemtopics", "microsoft.eventgrid/systemtopics/eventsubscriptions", "microsoft.eventgrid/topics", "microsoft.eventgrid/topictypes", "microsoft.recoveryservices/vaults" ] } }'
+$assignment = New-AzPolicyAssignment -Name 'AllowedResourceTypesCustom' -DisplayName 'Allowed resource types (Custom)' -Scope $scope -PolicyDefinition $policyDef -PolicyParameter $policyparam
+```
+
+You can list resource types of a given resource group with following az-cli
+```
+az resource list -g TARGET_RG --query '[].type' -o tsv | tr '[:upper:]' '[:lower:]' | sort | uniq -c | sort -nr
 ```
 
 * [EnvironmentTagValues_Deny](https://github.com/Azure/azure-policy/blob/master/built-in-policies/policyDefinitions/Tags/EnvironmentTagValues_Deny.json)
@@ -283,6 +301,12 @@ $assignment = New-AzPolicyAssignment -Name "VM use allowed Images" -DisplayName 
 FIXME!
 `New-AzPolicyDefinition: InvalidPolicyRule : Failed to parse policy rule: 'Could not find member 'Description' on object of type 'PolicyRuleDefinition'. Path 'Description'.'.`
 
+* TODO: NSG lock ssh, rdp
+depending on context if filtering upstream, private endpoint or so on.
+Still good practice as part of defense in depth if one layer is bypassed.
+Ideally, only private IP addresses are valid (Jumphost, Azure bastion...)
+
+
 ## Test
 
 With above examples, following should fail
@@ -300,6 +324,16 @@ Cleaning
 az vm delete --resource-group Testing --name TestPolicyVM --force-deletion true --yes
 ```
 (WARNING! Not deleting attached resources...)
+
+Alternate test, first two creation should fail, last one should succeed.
+
+```shell
+az login --tenant xyz.onmicrosoft.com
+az account set --subscription 'Azure Subscription 1'
+az databricks workspace create --resource-group Testing --name MyWorkspace --location westus --sku standard
+az databricks workspace create --resource-group Testing --name MyWorkspace --location westus --sku standard --tags 'environment=dev' 'engcontact=testadmin' 'ticket=TICKET-1234' 'azpolicyExemptUntil=2050/03/31'
+az databricks workspace create --resource-group Testing --name MyWorkspace --location westus --sku standard --tags 'environment=dev' 'engcontact=testadmin' 'ticket=TICKET-1234' 'azpolicyExemptUntil=2023/03/31'
+```
 
 ## Policy exemption
 

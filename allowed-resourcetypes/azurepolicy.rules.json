@@ -1,0 +1,75 @@
+{
+    "mode": "Indexed",
+    "policyRule": {
+      "if": {
+        "allOf": [
+          {
+            "field": "type",
+            "notIn": "[parameters('listOfResourceTypesAllowed')]"
+          },
+          {
+            "value": "[resourcegroup().name]",
+            "notIn": "[parameters('listOfUnrestrictedResourceGroups')]"
+          },
+          {
+            "anyOf": [
+              {
+                "field": "tags['azpolicyExemptUntil']",
+                "exists": false
+              },
+              {
+                "field": "tags['azpolicyExemptUntil']",
+                "less": "[utcNow()]"
+              },
+              {
+                "field": "tags['azpolicyExemptUntil']",
+                "greater": "[addDays(utcNow(), int(parameters('maxExemptDays')))]"
+              },
+              {
+                "field": "tags['engcontact']",
+                "exists": false
+              },
+              {
+                "field": "tags['businesscontact']",
+                "exists": false
+              },
+              {
+                "field": "tags['ticket']",
+                "exists": false
+              }
+            ]
+          }
+        ]
+      },
+      "then": {
+        "effect": "deny"
+      }
+    },
+    "parameters": {
+      "listOfResourceTypesAllowed": {
+        "type": "Array",
+        "metadata": {
+          "displayName": "Allowed resource types",
+          "description": "The list of resource types that can be deployed.",
+          "strongType": "resourceTypes"
+        }
+      },
+      "listOfUnrestrictedResourceGroups": {
+        "type": "Array",
+        "metadata": {
+          "displayName": "Unrestricted resource groups",
+          "description": "The list of resource groups for which policy won't be applied.",
+          "strongType": "existingResourceGroups"
+        },
+        "defaultValue": []
+      },
+      "maxExemptDays": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Maximum days for policy exemption",
+          "description": "The maximum allowed days for policy exemption."
+        },
+        "defaultValue": "365"
+      }
+    }
+  }
