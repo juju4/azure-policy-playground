@@ -116,6 +116,7 @@ Few examples
 * [Allowed locations](https://github.com/Azure/azure-policy/tree/master/samples/built-in-policy/allowed-locations)
 
 ```powershell
+$policyNamePrefix = 'custom-'
 # Get the built-in policy definition
 $policyDef = Get-AzPolicyDefinition -Id '/providers/Microsoft.Authorization/policyDefinitions/e56962a6-4747-49cd-b67b-bf8b01975c4c'
 # Set the scope
@@ -124,7 +125,7 @@ $scope = "/subscriptions/$($Subscription.Id)"
 # Params
 $policyparam = '{ "listOfAllowedLocations": { "value": [ "eastus", "eastus2", "westus", "westeurope" ] } }'
 # Create the Policy Assignment
-$assignment = New-AzPolicyAssignment -Name 'Allowed locations' -DisplayName 'Allowed locations' -Scope $scope -PolicyDefinition $policyDef -PolicyParameter $policyparam
+$assignment = New-AzPolicyAssignment -Name "${policyNamePrefix}Allowed locations" -DisplayName "${policyNamePrefix}Allowed locations" -Scope $scope -PolicyDefinition $policyDef -PolicyParameter $policyparam
 ```
 
 Check currently used locations with azure resource graph
@@ -150,17 +151,17 @@ $policyparam = '{ "listOfResourceTypesAllowed": { "value": [ "microsoft.compute/
 # for sentinel only scope
 $policyparam = '{ "listOfResourceTypesAllowed": { "value": [ "Microsoft.Resources/templateSpecs", "Microsoft.Web/connections", "Microsoft.Logic/workflows", "microsoft.insights/workbooks", "Microsoft.OperationsManagement/solutions", "microsoft.alertsmanagement/smartDetectorAlertRules", "Microsoft.Web/customApis", "Microsoft.Storage/storageAccounts", "Microsoft.Web/serverFarms", "microsoft.insights/dataCollectionRules", "Microsoft.OperationalInsights/workspaces", "Microsoft.Logic/integrationAccounts", "Microsoft.Insights/workbooks", "Microsoft.Insights/components", "microsoft.web/sites", "microsoft.insights/actiongroups" ] }, "listOfUnrestrictedResourceGroups": { "value": [ "unrestricted-playground-rg" ] }, "maxExemptDays": { "value": "365" } }'
 # Create the Policy Assignment
-$assignment = New-AzPolicyAssignment -Name 'Allowed resource types' -DisplayName 'Allowed resource types' -Scope $scope -PolicyDefinition $policyDef -PolicyParameter $policyparam
+$assignment = New-AzPolicyAssignment -Name "${policyNamePrefix}Allowed resource types" -DisplayName "${policyNamePrefix}Allowed resource types" -Scope $scope -PolicyDefinition $policyDef -PolicyParameter $policyparam
 ```
 
 If custom local policy files
 ```powershell
 $Subscription = Get-AzSubscription -SubscriptionName 'Azure Subscription 1'
 $scope = "/subscriptions/$($Subscription.Id)"
-$policyDef = New-AzPolicyDefinition -Name 'AllowedResourceTypesCustom' -Policy ./allowed-resourcetypes/azurepolicy.rules.json -Parameter ./allowed-resourcetypes/azurepolicy.parameters.json
+$policyDef = New-AzPolicyDefinition -Name "${policyNamePrefix}AllowedResourceTypesCustom" -Policy ./allowed-resourcetypes/azurepolicy.rules.json -Parameter ./allowed-resourcetypes/azurepolicy.parameters.json
 Get-AzPolicyDefinition -Name 'AllowedResourceTypesCustom'
 $policyparam = '{ "listOfResourceTypesAllowed": { "value": [ "microsoft.compute/locations/virtualmachines", "microsoft.compute/virtualmachines", "microsoft.compute/virtualmachines/extensions", "microsoft.compute/virtualmachines/runcommands", "microsoft.compute/virtualmachines/metricdefinitions", "microsoft.network/networksecuritygroups", "microsoft.keyvault/vaults", "microsoft.web/sites/functions", "microsoft.storage/storageaccounts", "microsoft.compute/disks", "microsoft.network/virtualnetworks", "microsoft.network/virtualnetworks/subnets", "microsoft.network/publicipaddresses", "microsoft.network/privateendpoints", "microsoft.network/networkinterfaces", "microsoft.web/serverfarms", "microsoft.web/sites", "microsoft.insights/components", "microsoft.policyinsights/eventgridfilters", "microsoft.eventgrid/systemtopics", "microsoft.eventgrid/systemtopics/eventsubscriptions", "microsoft.eventgrid/topics", "microsoft.eventgrid/topictypes", "microsoft.recoveryservices/vaults" ] } }'
-$assignment = New-AzPolicyAssignment -Name 'AllowedResourceTypesCustom' -DisplayName 'Allowed resource types (Custom)' -Scope $scope -PolicyDefinition $policyDef -PolicyParameter $policyparam
+$assignment = New-AzPolicyAssignment -Name "${policyNamePrefix}AllowedResourceTypes" -DisplayName "${policyNamePrefix}Allowed resource types" -Scope $scope -PolicyDefinition $policyDef -PolicyParameter $policyparam
 ```
 
 You can list resource types of a given resource group with following az-cli
@@ -177,30 +178,30 @@ Resources
 * [EnvironmentTagValues_Deny](https://github.com/Azure/azure-policy/blob/master/built-in-policies/policyDefinitions/Tags/EnvironmentTagValues_Deny.json)
 
 ```powershell
-$definition = New-AzPolicyDefinition -Name "EnvironmentTagValues_Deny" -DisplayName "[Deprecated]: Allow resource creation if 'environment' tag value in allowed values" -Policy 'https://raw.githubusercontent.com/Azure/azure-policy/master/built-in-policies/policyDefinitions/Tags/EnvironmentTagValues_Deny.json' -Mode Indexed
+$definition = New-AzPolicyDefinition -Name "${policyNamePrefix}EnvironmentTagValues_Deny" -DisplayName "${policyNamePrefix}[Deprecated]: Allow resource creation if 'environment' tag value in allowed values" -Policy 'https://raw.githubusercontent.com/Azure/azure-policy/master/built-in-policies/policyDefinitions/Tags/EnvironmentTagValues_Deny.json' -Mode Indexed
 $Subscription = Get-AzSubscription -SubscriptionName 'Azure Subscription 1'
 $scope = "/subscriptions/$($Subscription.Id)"
-$assignment = New-AzPolicyAssignment -Name 'EnvironmentTagValues_Deny' -DisplayName "[Deprecated]: Allow resource creation if 'environment' tag value in allowed values" -Scope $scope -PolicyDefinition $definition
+$assignment = New-AzPolicyAssignment -Name "${policyNamePrefix}EnvironmentTagValues_Deny' -DisplayName "${policyNamePrefix}[Deprecated]: Allow resource creation if 'environment' tag value in allowed values" -Scope $scope -PolicyDefinition $definition
 ```
 
 * [RequireTag_Deny](https://github.com/Azure/azure-policy/blob/master/built-in-policies/policyDefinitions/Tags/RequireTag_Deny.json)
 
 ```powershell
-$definition = New-AzPolicyDefinition -Name "RequireTag_Deny" -DisplayName "Require a tag on resources" -Policy 'https://raw.githubusercontent.com/Azure/azure-policy/master/built-in-policies/policyDefinitions/Tags/RequireTag_Deny.json' -Mode Indexed
+$definition = New-AzPolicyDefinition -Name "${policyNamePrefix}RequireTag_Deny" -DisplayName "${policyNamePrefix}Require a tag on resources" -Policy 'https://raw.githubusercontent.com/Azure/azure-policy/master/built-in-policies/policyDefinitions/Tags/RequireTag_Deny.json' -Mode Indexed
 $Subscription = Get-AzSubscription -SubscriptionName 'Azure Subscription 1'
 $scope = "/subscriptions/$($Subscription.Id)"
 $policyparam = '{ "tagName": { "value": "engcontact" }}'
-$assignment = New-AzPolicyAssignment -Name 'RequireTag_Deny' -DisplayName "Require a tag on resources" -Scope $scope -PolicyDefinition $definition -PolicyParameter $policyparam
+$assignment = New-AzPolicyAssignment -Name "${policyNamePrefix}RequireTag_Deny" -DisplayName "${policyNamePrefix}Require a tag on resources" -Scope $scope -PolicyDefinition $definition -PolicyParameter $policyparam
 ```
 
 * [ResourceGroupRequireTag_Deny](https://github.com/Azure/azure-policy/blob/master/built-in-policies/policyDefinitions/Tags/ResourceGroupRequireTag_Deny.json)
 
 ```powershell
-$definition = New-AzPolicyDefinition -Name "ResourceGroupRequireTag_Deny" -DisplayName "Require a tag on resource groups" -Policy 'https://raw.githubusercontent.com/Azure/azure-policy/master/built-in-policies/policyDefinitions/Tags/ResourceGroupRequireTag_Deny.json' -Mode Indexed
+$definition = New-AzPolicyDefinition -Name "${policyNamePrefix}ResourceGroupRequireTag_Deny" -DisplayName "${policyNamePrefix}Require a tag on resource groups" -Policy 'https://raw.githubusercontent.com/Azure/azure-policy/master/built-in-policies/policyDefinitions/Tags/ResourceGroupRequireTag_Deny.json' -Mode Indexed
 $Subscription = Get-AzSubscription -SubscriptionName 'Azure Subscription 1'
 $scope = "/subscriptions/$($Subscription.Id)"
 $policyparam = '{ "tagName": { "value": "engcontact" }}'
-$assignment = New-AzPolicyAssignment -Name 'ResourceGroupRequireTag_Deny' -DisplayName "Require a tag on resource groups" -Scope $scope -PolicyDefinition $definition -PolicyParameter $policyparam
+$assignment = New-AzPolicyAssignment -Name "${policyNamePrefix}ResourceGroupRequireTag_Deny" -DisplayName "${policyNamePrefix}Require a tag on resource groups" -Scope $scope -PolicyDefinition $definition -PolicyParameter $policyparam
 ```
 FIXME!
 `New-AzPolicyDefinition: InvalidPolicyParameterUpdate : The policy contains new parameter(s) 'tagName' which are not present in the existing policy and have no default value. New parameters may be added to a policy only if they have a default value.`
@@ -285,21 +286,21 @@ FIXME!
 * [Only approved VM extensions should be installed](https://github.com/Azure/azure-policy/blob/master/built-in-policies/policyDefinitions/Compute/VirtualMachines_ApprovedExtensions_Audit.json). [Azure virtual machine extensions and features](https://learn.microsoft.com/en-us/azure/virtual-machines/extensions/overview)
 
 ```powershell
-$definition = New-AzPolicyDefinition -Name "VirtualMachines_ApprovedExtensions_Deny" -DisplayName "Only approved VM extensions should be installed" -Policy 'https://raw.githubusercontent.com/Azure/azure-policy/master/built-in-policies/policyDefinitions/Compute/VirtualMachines_ApprovedExtensions_Audit.json' -Mode Indexed
+$definition = New-AzPolicyDefinition -Name "${policyNamePrefix}VirtualMachines_ApprovedExtensions_Deny" -DisplayName "${policyNamePrefix}Only approved VM extensions should be installed" -Policy 'https://raw.githubusercontent.com/Azure/azure-policy/master/built-in-policies/policyDefinitions/Compute/VirtualMachines_ApprovedExtensions_Audit.json' -Mode Indexed
 $Subscription = Get-AzSubscription -SubscriptionName 'Azure Subscription 1'
 $scope = "/subscriptions/$($Subscription.Id)"
 $policyparam = '{ "effect": { "value": "Deny" }, "approvedExtensions": { "value": ["AzureDiskEncryption", "AzureDiskEncryptionForLinux", "WindowsAgent.AzureSecurityCenter", "ConfigurationforWindows", "DependencyAgentWindows", "AzureMonitorWindowsAgent", "ConfigurationforLinux", "LinuxDiagnostic", "DependencyAgentLinux", "AzureMonitorLinuxAgent", "MDE.Linux", "MDE.Windows", "VMSnapshot", "AADLoginForWindows", "AADSSHLoginForLinux"] }}'
-$assignment = New-AzPolicyAssignment -Name 'VirtualMachines_ApprovedExtensions_Deny' -DisplayName "Only approved VM extensions should be installed" -Scope $scope -PolicyDefinition $definition -PolicyParameter $policyparam
+$assignment = New-AzPolicyAssignment -Name "${policyNamePrefix}VirtualMachines_ApprovedExtensions_Deny" -DisplayName "${policyNamePrefix}Only approved VM extensions should be installed" -Scope $scope -PolicyDefinition $definition -PolicyParameter $policyparam
 ```
 
 * [add-date-created-tag](https://github.com/Azure/Community-Policy/blob/master/Policies/Tags/add-date-created-tag/azurepolicy.rules.json)
 
 ```powershell
-$definition = New-AzPolicyDefinition -Name "add-date-created-tag" -DisplayName "Add DateCreated Tag to Resources" -Policy 'https://raw.githubusercontent.com/Azure/Community-Policy/master/Policies/Tags/add-date-created-tag/azurepolicy.json' -Mode Indexed
+$definition = New-AzPolicyDefinition -Name "${policyNamePrefix}add-date-created-tag" -DisplayName "${policyNamePrefix}Add DateCreated Tag to Resources" -Policy 'https://raw.githubusercontent.com/Azure/Community-Policy/master/Policies/Tags/add-date-created-tag/azurepolicy.json' -Mode Indexed
 $Subscription = Get-AzSubscription -SubscriptionName 'Azure Subscription 1'
 $scope = "/subscriptions/$($Subscription.Id)"
 $policyparam = '{ "tagName": { "value": "createdon" } }'
-$assignment = New-AzPolicyAssignment -Name 'add-date-created-tag' -DisplayName "Add DateCreated Tag to Resources" -Scope $scope -PolicyDefinition $definition -PolicyParameter $policyparam -Location 'eastus' -IdentityType "SystemAssigned"
+$assignment = New-AzPolicyAssignment -Name "${policyNamePrefix}add-date-created-tag" -DisplayName "${policyNamePrefix}Add DateCreated Tag to Resources" -Scope $scope -PolicyDefinition $definition -PolicyParameter $policyparam -Location 'eastus' -IdentityType "SystemAssigned"
 ```
 
 * [VM use allowed Images](https://github.com/Azure/Community-Policy/tree/master/Policies/Compute/VM%20use%20allowed%20Images)
