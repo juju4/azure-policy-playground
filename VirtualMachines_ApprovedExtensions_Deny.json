@@ -12,7 +12,7 @@
         "parameters": {
             "effect": {
                 "type": "string",
-                "defaultValue": "Audit",
+                "defaultValue": "Deny",
                 "allowedValues": [
                     "Audit",
                     "Deny",
@@ -25,6 +25,23 @@
             },
             "approvedExtensions": {
                 "type": "Array",
+                "defaultValue": [
+                    "AzureDiskEncryption",
+                    "AzureDiskEncryptionForLinux",
+                    "WindowsAgent.AzureSecurityCenter",
+                    "ConfigurationforWindows",
+                    "DependencyAgentWindows",
+                    "AzureMonitorWindowsAgent",
+                    "ConfigurationforLinux",
+                    "LinuxDiagnostic",
+                    "DependencyAgentLinux",
+                    "AzureMonitorLinuxAgent",
+                    "MDE.Linux",
+                    "MDE.Windows",
+                    "VMSnapshot",
+                    "AADLoginForWindows",
+                    "AADSSHLoginForLinux"
+                ],
                 "metadata": {
                     "description": "The list of approved extension types that can be installed. Example: AzureDiskEncryption",
                     "displayName": "Approved extensions"
