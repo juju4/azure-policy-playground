@@ -127,6 +127,13 @@ $policyparam = '{ "listOfAllowedLocations": { "value": [ "eastus", "eastus2", "w
 $assignment = New-AzPolicyAssignment -Name 'Allowed locations' -DisplayName 'Allowed locations' -Scope $scope -PolicyDefinition $policyDef -PolicyParameter $policyparam
 ```
 
+Check currently used locations with azure resource graph
+```
+Resources
+| summarize count() by location
+| order by count_ desc
+```
+
 * [Allowed resource types](https://github.com/Azure/azure-policy/tree/master/samples/built-in-policy/allowed-resourcetypes)
 
 ```powershell
@@ -159,6 +166,12 @@ $assignment = New-AzPolicyAssignment -Name 'AllowedResourceTypesCustom' -Display
 You can list resource types of a given resource group with following az-cli
 ```
 az resource list -g TARGET_RG --query '[].type' -o tsv | tr '[:upper:]' '[:lower:]' | sort | uniq -c | sort -nr
+```
+or with azure resource graph
+```
+Resources
+| summarize count() by type
+| order by count_ desc
 ```
 
 * [EnvironmentTagValues_Deny](https://github.com/Azure/azure-policy/blob/master/built-in-policies/policyDefinitions/Tags/EnvironmentTagValues_Deny.json)
