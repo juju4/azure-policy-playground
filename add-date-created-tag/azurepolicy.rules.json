@@ -13,7 +13,7 @@
                 {
                     "operation": "add",
                     "field": "[concat('tags[', parameters('tagName'), ']')]",
-                    "value": "[concat(substring(utcNow(),5,2), '/', substring(utcNow(),8,2), '/', substring(utcNow(),0,4))]"
+                    "value": "[utcNow()]"
                 }
             ]
         }
