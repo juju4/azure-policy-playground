@@ -331,15 +331,20 @@ Alternate test, first two creation should fail, last one should succeed.
 az login --tenant xyz.onmicrosoft.com
 az account set --subscription 'Azure Subscription 1'
 az databricks workspace create --resource-group Testing --name MyWorkspace --location westus --sku standard
-az databricks workspace create --resource-group Testing --name MyWorkspace --location westus --sku standard --tags 'environment=dev' 'engcontact=testadmin' 'ticket=TICKET-1234' 'azpolicyExemptUntil=2050/03/31'
-az databricks workspace create --resource-group Testing --name MyWorkspace --location westus --sku standard --tags 'environment=dev' 'engcontact=testadmin' 'ticket=TICKET-1234' 'azpolicyExemptUntil=2023/03/31'
+az databricks workspace create --resource-group Testing --name MyWorkspace --location westus --sku standard --tags 'environment=dev' 'engcontact=testadmin' 'ticket=TICKET-1234' 'azpolicyExemptUntil=2050/07/01'
+az databricks workspace create --resource-group Testing --name MyWorkspace --location westus --sku standard --tags 'environment=dev' 'engcontact=testadmin' 'ticket=TICKET-1234' 'azpolicyExemptUntil=2023/07/01'
 ```
 
 ## Policy exemption
 
-TODO:
-tags['azpolicyExemptUntil'] and tags['engcontact'] and tags['ticket']
-azpolicyExemptUntil should be an expiry date with a reasonable time.
+If:
+* listOfUnrestrictedResourceGroups, typically a lab
+* tagging conditions
+  * tags['azpolicyExemptUntil']: azpolicyExemptUntil should be an expiry date with a reasonable time: set between day policy is configured and a year later
+  * tags['businesscontact']
+  * tags['engcontact']
+  * tags['ticket']
+
 
 ## References
 
