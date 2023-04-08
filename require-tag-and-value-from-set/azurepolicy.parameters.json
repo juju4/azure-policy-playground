@@ -1,21 +1,23 @@
 {
     "tagName": {
         "type": "String",
+        "defaultValue": "environment",
         "metadata": {
             "displayName": "Tag Name",
-            "description": "Name of the tag, such as 'Environment'"
+            "description": "Name of the tag, such as 'environment'"
         }
     },
     "tagValue": {
         "type": "Array",
         "metadata": {
             "displayName": "Tag Value",
-            "description": "Value of the tag, such as 'Prod'"
+            "description": "Value of the tag, such as 'prod'"
         },
         "allowedValues": [
-            "Dev",
-            "Test",
-            "Prod"
+            "dev",
+            "qa",
+            "staging",
+            "prod"
         ]
     }
 }
